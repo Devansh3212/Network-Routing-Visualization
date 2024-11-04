@@ -13,6 +13,7 @@ WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT)) 
 """"""
 pygame.display.set_caption("Network Packet Routing - Bellman-Ford & Dijkstra Algorithms")
+"""Caption for window"""
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -20,25 +21,44 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
-
+"""Colour composition"""
 font = pygame.font.SysFont(None, 24)
+"""Font type for text in window"""
 class NetworkGraph:
-    def __init__(self, vertices):
-        self.vertices = vertices
-        self.edges = []
-        self.adj_list = defaultdict(list)
-    def add_edge(self, u, v, weight):
-        self.edges.append((u, v, weight))
+    def __init__(self, vertices): # Initialized with a list vertices
+        self.vertices = vertices 
+        self.edges = [] # Edges are the paths between nodes (For Bellman-Ford)
+        self.adj_list = defaultdict(list) # An adjacency list for tracking connections between nodes (For Dijkstra)
+    def add_edge(self, u, v, weight): # For adding an edge between two nodes (Addes an edge on both bellman and dijkstra lists)
+        self.edges.append((u, v, weight)) 
         self.adj_list[u].append((v, weight))
         self.adj_list[v].append((u, weight))
-    def bellman_ford(self, source):
-        distance = {v: float('inf') for v in range(self.vertices)}
-        distance[source] = 0
-        predecessor = {v: None for v in range(self.vertices)}
+    def bellman_ford(self, source): # Implementation of Bellman Ford Route finding algorithm 
+        distance = {v: float('inf') for v in range(self.vertices)} # Initializes distancce to all other nodes as infinity
+        distance[source] = 0 #  except the source node distance whih is set to zero.
+        predecessor = {v: None for v in range(self.vertices)} 
+        """
+        Bellman ford algorithm: 
+            - Can handle negative edge weights
+            - Time complexity: O(VE) where V is vertices and E is edges
+            - Works by relaxing all edges V-1 times
+            - Can detect negative cycles
+            - Used in routing protocols like RIP (Routing Information Protocol)
+        """
         visited = set()
         priority_queue = [(0, source)]
+        """
+        For each vertex, iterate through all edges in the graph and update the distance of each connected vertex 
+        if a shorter path is found. 
+        This process is repeated V-1 times, where V is the number of vertices.
+        """
         while priority_queue:
             current_dist, u = heapq.heappop(priority_queue)
+            """
+            Negative Cycle Detection: 
+            After V-1 relaxations, if you can still relax an edge, it indicates a negative cycle, 
+            which the algorithm detects to prevent infinite looping.
+            """
             if u in visited:
                 continue
             visited.add(u)
@@ -48,10 +68,16 @@ class NetworkGraph:
                     predecessor[v] = u
                     heapq.heappush(priority_queue, (distance[v], v))
         return distance, predecessor
-    def dijkstra(self, source):
+    def dijkstra(self, source): # Implementation of Dijkstra Algorithms 
         distance = {v: float('inf') for v in range(self.vertices)}
         distance[source] = 0
         predecessor = {v: None for v in range(self.vertices)}
+        """
+        Initialization: Set the distance to the source node as 0 and to all other nodes as infinity.
+        Priority Queue: Use a priority queue to keep track of the shortest distance found so far. 
+        The algorithm selects the node with the shortest distance, then updates the distances to its neighbors if a shorter path is found.
+        Greedy Approach: The algorithm progressively locks in the shortest path to each node without revisiting it, making it faster.
+        """
         for _ in range(self.vertices - 1):
             for u, v, weight in self.edges:
                 if distance[u] != float('inf') and distance[u] + weight < distance[v]:
