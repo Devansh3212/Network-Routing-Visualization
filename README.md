@@ -134,7 +134,7 @@ python -m pip install pygame
 - Ensure source and destination nodes are valid
 
 ## Contributing
-
+Contributors - Aditya-Codes-247 , Devansh3212
 Feel free to fork the project and submit pull requests. Areas for potential improvement:
 - Add directed edges support
 - Implement additional routing algorithms
